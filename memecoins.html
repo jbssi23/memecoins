@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Coins - Oportunidades em Tempo Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #333333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <script>
+        async function fetchMemeCoins() {
+            const apiUrl = 'https://api.coingecko.com/api/v3/coins/markets';
+            const params = new URLSearchParams({
+                vs_currency: 'usd',
+                category: 'meme-token',
+                order: 'market_cap_desc',
+                per_page: 250,
+                page: 1,
+                sparkline: false
+            });
+
+            try {
+                const response = await fetch(`${apiUrl}?${params}`);
+                const data = await response.json();
+                const tableBody = document.getElementById('meme-coins-table');
+
+                tableBody.innerHTML = '';
+
+                data.forEach(coin => {
+                    const row = document.createElement('tr');
+
+                    const signal = coin.price_change_percentage_24h > 10 ? 'Comprar' : coin.price_change_percentage_24h < -5 ? 'Vender' : 'Aguardar';
+                    const signalColor = signal === 'Comprar' ? 'green' : signal === 'Vender' ? 'red' : 'orange';
+
+                    row.innerHTML = `
+                        <td>${coin.symbol.toUpperCase()}</td>
+                        <td>$${coin.current_price.toFixed(4)}</td>
+                        <td>${coin.price_change_percentage_24h.toFixed(2)}%</td>
+                        <td style="color: ${signalColor}; font-weight: bold;">${signal}</td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMemeCoins();
+            setInterval(fetchMemeCoins, 15000); // Atualiza a cada 15 segundos (15.000 ms)
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Meme Coins: Oportunidades de Compra e Venda</h1>
+        <p>Confira abaixo as melhores oportunidades de compra e venda em tempo real:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Preço Atual (USD)</th>
+                    <th>Variação 24h (%)</th>
+                    <th>Sinal</th>
+                </tr>
+            </thead>
+            <tbody id="meme-coins-table">
+                <tr>
+                    <td colspan="4">Carregando dados...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
